@@ -1,7 +1,7 @@
 (function () {
   if (typeof window.ms_data_ring != "undefined") return;
   var rooterBefore = "";
-  var uploadActionHolder=undefined;
+  var uploadActionHolder = undefined;
   var e = "v1.0.0",
     ms_data_ring = (function (s, o) {
       var u;
@@ -20,15 +20,20 @@
         w = {},
         E = {},
         S = { trackUrl: null, clickUrl: null, areaIds: null, hbLogTimer: 0 },
-        changeRouter = function (type,before, current) {
-          console.log('ms_data_ring====================================',type,before,current);
-          rooterBefore=current;
-          uploadAction('changeRouter',{before:before,current:current});
+        changeRouter = function (type, before, current) {
+          console.log(
+            "ms_data_ring====================================",
+            type,
+            before,
+            current
+          );
+          rooterBefore = current;
+          uploadAction("changeRouter", { before: before, current: current });
         },
-        uploadAction = function (type,json) {
-          console.log("ms_data_ring 模拟上传",type,json);
-          if(uploadActionHolder){
-            uploadActionHolder(type,json);
+        uploadAction = function (type, json) {
+          console.log("ms_data_ring 模拟上传", type, json);
+          if (uploadActionHolder) {
+            uploadActionHolder(type, json);
           }
         };
       return {
@@ -45,7 +50,7 @@
           document.addEventListener("mousedown", function (event) {
             // 在这里处理键盘按键事件
             let element = event.target;
-            uploadAction('mousedown',{data:element.outerHTML});
+            uploadAction("mousedown", { data: element.outerHTML });
           });
 
           window.addEventListener("hashchange", function (event) {
@@ -126,15 +131,17 @@
           window.addHistoryListener("history", function () {
             changeRouter("history", rooterBefore, window.location.href);
           });
-          changeRouter('init',rooterBefore, window.location.href)
+          changeRouter("init", rooterBefore, window.location.href);
         },
-        setUploadListener(uploader){
+        setUploadListener(uploader) {
           uploadActionHolder = uploader;
-        }
+        },
       };
     })(window);
   ms_data_ring.init();
-  (window.ms_data_ring = ms_data_ring),
-    typeof window.ms_data_ring_monitor == "undefined" &&
-      (window.ms_data_ring_monitor = ms_data_ring);
+  (window.msSDK = ms_data_ring),
+    typeof window.msSDK == "undefined" &&
+      (window.msSDK = ms_data_ring);
+
+  window.msSDK = ms_data_ring;
 })();
