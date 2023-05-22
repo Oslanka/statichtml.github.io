@@ -22,6 +22,7 @@
         S = { trackUrl: null, clickUrl: null, areaIds: null, hbLogTimer: 0 },
         changeRouter = function (type,before, current) {
           console.log('ms_data_ring====================================',type,before,current);
+          rooterBefore=current;
         },
         uploadAction = function (e) {
           console.log("模拟上传");
