@@ -1,7 +1,7 @@
 (function () {
   if (typeof window.ms_data_ring != "undefined") return;
   console.log("test---------ms_data_ring");
-
+  var rooterBefore = "";
   var e = "v1.0.0",
     ms_data_ring = (function (s, o) {
       var u;
@@ -20,6 +20,9 @@
         w = {},
         E = {},
         S = { trackUrl: null, clickUrl: null, areaIds: null, hbLogTimer: 0 },
+        changeRouter = function (type,before, current) {
+          console.log('ms_data_ring====================================',type,before,current);
+        },
         uploadAction = function (e) {
           console.log("模拟上传");
         };
@@ -29,7 +32,6 @@
         data: E,
         config: S,
         init: function () {
-          console.log("test---------ms_data_ring init");
           console.log("test---------ms_data_ring-init");
           document.addEventListener("keydown", function (event) {
             // 在这里处理键盘按键事件
@@ -49,18 +51,16 @@
           });
 
           window.addEventListener("hashchange", function (event) {
-            console.log("test---------ms_data_ring hashchange：", event);
-            uploadAction();
-          });
-          window.onpopstate = function (event) {
-            console.log(
-              "test---------ms_data_ring onpopstate",
+            changeRouter(
+              "hashchange",
+              rooterBefore,
               window.location.href,
               event
             );
-            uploadAction();
+          });
+          window.onpopstate = function (event) {
+            changeRouter("popstate", rooterBefore, window.location.href, event);
           };
-
 
           class Dep {
             // 订阅池
@@ -86,7 +86,7 @@
             }
           }
           Dep.watch = null;
-          
+
           class Watch {
             constructor(name, fn) {
               this.name = name; //订阅消息的名称
@@ -122,22 +122,17 @@
               }
             };
           })();
-          window.addHistoryListener = addHistoryMethod('historychange');
-          history.pushState =  addHistoryMethod('pushState');
-          history.replaceState =  addHistoryMethod('replaceState');
-
-
+          window.addHistoryListener = addHistoryMethod("historychange");
+          history.pushState = addHistoryMethod("pushState");
+          history.replaceState = addHistoryMethod("replaceState");
           window.addHistoryListener("history", function () {
-            console.log("ms_data_ring 窗口的history改变了",window.location.href);
+            changeRouter("history", rooterBefore, window.location.href);
           });
         },
       };
     })(window);
   ms_data_ring.init();
   (window.ms_data_ring = ms_data_ring),
-    typeof window.ms_data_ring_monitor == "undefined" && (window.ms_data_ring_monitor = ms_data_ring);
+    typeof window.ms_data_ring_monitor == "undefined" &&
+      (window.ms_data_ring_monitor = ms_data_ring);
 })();
-
-
-
-
