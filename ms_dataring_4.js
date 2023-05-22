@@ -1,7 +1,7 @@
 (function () {
   if (typeof window.ms_data_ring != "undefined") return;
-  console.log("test---------ms_data_ring");
   var rooterBefore = "";
+  var uploadActionHolder=undefined;
   var e = "v1.0.0",
     ms_data_ring = (function (s, o) {
       var u;
@@ -23,9 +23,13 @@
         changeRouter = function (type,before, current) {
           console.log('ms_data_ring====================================',type,before,current);
           rooterBefore=current;
+          uploadAction('changeRouter',{before:before,current:current});
         },
-        uploadAction = function (e) {
-          console.log("模拟上传");
+        uploadAction = function (type,json) {
+          console.log("ms_data_ring 模拟上传",type,json);
+          if(uploadActionHolder){
+            uploadActionHolder(type,json);
+          }
         };
       return {
         version: e,
@@ -33,7 +37,6 @@
         data: E,
         config: S,
         init: function () {
-          console.log("test---------ms_data_ring-init");
           document.addEventListener("keydown", function (event) {
             // 在这里处理键盘按键事件
             // console.log("test---------ms_data_ring按下的键：", event.key);
@@ -41,14 +44,8 @@
           });
           document.addEventListener("mousedown", function (event) {
             // 在这里处理键盘按键事件
-
             let element = event.target;
-            console.log(
-              "test---------ms_data_ring按下的键mousedown：",
-              event,
-              element
-            );
-            uploadAction();
+            uploadAction('mousedown',{data:element});
           });
 
           window.addEventListener("hashchange", function (event) {
@@ -131,6 +128,9 @@
           });
           changeRouter('init',rooterBefore, window.location.href)
         },
+        setUploadListener(uploader){
+          uploadActionHolder = uploader;
+        }
       };
     })(window);
   ms_data_ring.init();
