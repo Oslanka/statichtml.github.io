@@ -45,7 +45,7 @@
           document.addEventListener("mousedown", function (event) {
             // 在这里处理键盘按键事件
             let element = event.target;
-            uploadAction('mousedown',{data:element});
+            uploadAction('mousedown',{data:element.outerHTML});
           });
 
           window.addEventListener("hashchange", function (event) {
