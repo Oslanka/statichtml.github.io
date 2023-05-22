@@ -129,6 +129,7 @@
           window.addHistoryListener("history", function () {
             changeRouter("history", rooterBefore, window.location.href);
           });
+          changeRouter('init',rooterBefore, window.location.href)
         },
       };
     })(window);
