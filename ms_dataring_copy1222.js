@@ -128,17 +128,14 @@
 
 
           window.addHistoryListener("history", function () {
-            console.log("ms_data_ring 窗口的history改变了");
-          });
-          window.addHistoryListener("history", function () {
-            console.log("ms_data_ring 窗口的history改变了-我也听到了");
+            console.log("ms_data_ring 窗口的history改变了",window.location.href);
           });
         },
       };
     })(window);
   ms_data_ring.init();
   (window.ms_data_ring = ms_data_ring),
-    typeof window.monitor == "undefined" && (window.monitor = ms_data_ring);
+    typeof window.ms_data_ring_monitor == "undefined" && (window.ms_data_ring_monitor = ms_data_ring);
 })();
 
 
