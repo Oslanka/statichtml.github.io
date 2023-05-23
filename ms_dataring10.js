@@ -23,7 +23,9 @@
     ms_data_ring = (function () {
         changeRouter = function (type, before, current) {
           rooterBefore = current;
-          uploadAction( {eventType:"changeRouter", prePageUrl: before, pageUrl: current ,'device':baseJsonInfo});
+          let json = {eventType:"changeRouter", prePageUrl: before, pageUrl: current }
+          Object.assign(json,baseJsonInfo)
+          uploadAction(json );
         },
         uploadAction = function ( json) {
           if (uploadActionHolder) {
@@ -40,7 +42,9 @@
           document.addEventListener("mousedown", function (event) {
             // 在这里处理键盘按键事件
             let element = event.target;
-            uploadAction( {eventType:'mousedown', domContent: element.outerHTML,'device':baseJsonInfo });
+            let json =  {eventType:'mousedown', domContent: element.outerHTML}
+            Object.assign(json,baseJsonInfo)
+            uploadAction(json );
           });
 
           window.addEventListener("hashchange", function (event) {
