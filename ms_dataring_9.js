@@ -22,20 +22,12 @@
 },
     ms_data_ring = (function () {
         changeRouter = function (type, before, current) {
-          console.log(
-            "ms_data_ring====================================",
-            '---->ua'+uap.getResult().os.name,
-            type,
-            before,
-            current
-          );
           rooterBefore = current;
-          uploadAction("changeRouter", { prePageUrl: before, pageUrl: current ,'device':baseJsonInfo});
+          uploadAction( {eventType:"changeRouter", prePageUrl: before, pageUrl: current ,'device':baseJsonInfo});
         },
-        uploadAction = function (type, json) {
-          console.log("ms_data_ring 模拟上传", type, json);
+        uploadAction = function ( json) {
           if (uploadActionHolder) {
-            uploadActionHolder(type, json);
+            uploadActionHolder(json);
           }
         };
       return {
@@ -48,7 +40,7 @@
           document.addEventListener("mousedown", function (event) {
             // 在这里处理键盘按键事件
             let element = event.target;
-            uploadAction("mousedown", { domContent: element.outerHTML,'device':baseJsonInfo });
+            uploadAction( {eventType:'mousedown', domContent: element.outerHTML,'device':baseJsonInfo });
           });
 
           window.addEventListener("hashchange", function (event) {
