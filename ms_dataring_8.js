@@ -133,6 +133,7 @@
         },
         setUploadListener(uploader) {
           uploadActionHolder = uploader;
+          changeRouter("init", rooterBefore, window.location.href);
         },
       };
     })(window);
