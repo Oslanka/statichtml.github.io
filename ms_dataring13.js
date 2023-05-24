@@ -7,7 +7,6 @@
   var rooterBefore = "";
   var uploadActionHolder = undefined;
   var sdk_version = "v1.0.0";
-  var projectName ='';
   let uap = new UAParser(navigator.userAgent);
      // 生成一个随机的设备ID
     const  generateDeviceId=function() {
@@ -18,7 +17,7 @@
       }
       return deviceId;
     };
-  const baseJsonInfo = { productName:projectName,sdkVersion: sdk_version, sdkType: 'sdk', deviceId: generateDeviceId(),deviceLanguage:(navigator.language || navigator.userLanguage),deviceResolution:JSON.stringify({screenWidth:window.screen.width,screenHeight:window.screen.height}) ,
+  var baseJsonInfo = { productName:'',sdkVersion: sdk_version, sdkType: 'sdk', deviceId: generateDeviceId(),deviceLanguage:(navigator.language || navigator.userLanguage),deviceResolution:JSON.stringify({screenWidth:window.screen.width,screenHeight:window.screen.height}) ,
   deviceOsType:uap.getResult().os.name ,deviceOsVer:uap.getResult().os.version,deviceBrowserVer:JSON.stringify(uap.getBrowser())
 },
     ms_data_ring = (function () {
@@ -35,7 +34,7 @@
         };
       return {
         init: function (project) {
-          projectName=project;
+          baseJsonInfo.projectName=project;
           document.addEventListener("keydown", function (event) {
             // 在这里处理键盘按键事件
             // console.log("test---------ms_data_ring按下的键：", event.key);
