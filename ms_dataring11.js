@@ -18,13 +18,13 @@
       }
       return deviceId;
     };
-  const baseJsonInfo = { productName:projectName,sdkVersion: sdk_version, sdkType: 'sdk', productName: null, deviceId: generateDeviceId(),deviceLanguage:(navigator.language || navigator.userLanguage),deviceResolution:JSON.stringify({screenWidth:window.screen.width,screenHeight:window.screen.height}) ,
+  const baseJsonInfo = { productName:projectName,sdkVersion: sdk_version, sdkType: 'sdk', deviceId: generateDeviceId(),deviceLanguage:(navigator.language || navigator.userLanguage),deviceResolution:JSON.stringify({screenWidth:window.screen.width,screenHeight:window.screen.height}) ,
   deviceOsType:uap.getResult().os.name ,deviceOsVer:uap.getResult().os.version,deviceBrowserVer:JSON.stringify(uap.getBrowser())
 },
     ms_data_ring = (function () {
         changeRouter = function (type, before, current) {
           rooterBefore = current;
-          let json = {eventType:"changeRouter", prePageUrl: before, pageUrl: current }
+          let json = {eventType:type, prePageUrl: before, pageUrl: current }
           Object.assign(json,baseJsonInfo)
           uploadAction(json );
         },
