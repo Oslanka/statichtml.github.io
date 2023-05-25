@@ -29,11 +29,18 @@
         },
         uploadAction = function ( json) {
           if (uploadActionHolder) {
+            let pro = localStorage.getItem('ms_project');
+            if(pro){
+              json.projectName = pro;
+            }
             uploadActionHolder(json);
           }
         };
       return {
         init: function (project) {
+          if(project){
+            localStorage.setItem('ms_project',project)
+          }
           baseJsonInfo.projectName=project;
           document.addEventListener("keydown", function (event) {
             // 在这里处理键盘按键事件
