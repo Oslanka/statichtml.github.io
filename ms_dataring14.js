@@ -29,9 +29,9 @@
         },
         uploadAction = function ( json) {
           if (uploadActionHolder) {
-            let pro = localStorage.getItem('ms_project');
+            let pro = localStorage.getItem('productName');
             if(pro){
-              json.projectName = pro;
+              json.productName = pro;
             }
             uploadActionHolder(json);
           }
@@ -39,9 +39,9 @@
       return {
         init: function (project) {
           if(project){
-            localStorage.setItem('ms_project',project)
+            localStorage.setItem('productName',project)
           }
-          baseJsonInfo.projectName=project;
+          baseJsonInfo.productName=project;
           document.addEventListener("keydown", function (event) {
             // 在这里处理键盘按键事件
             // console.log("test---------ms_data_ring按下的键：", event.key);
