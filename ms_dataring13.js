@@ -43,7 +43,7 @@
           document.addEventListener("mousedown", function (event) {
             // 在这里处理键盘按键事件
             let element = event.target;
-            let json =  {eventType:'mousedown', domContent: element.outerHTML}
+            let json =  {eventType:'mousedown',prePageUrl: rooterBefore, pageUrl: window.location.href, domContent: element.outerHTML}
             Object.assign(json,baseJsonInfo)
             uploadAction(json );
           });
