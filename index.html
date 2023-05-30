@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <script  src="./ms_dataring16.js">
+    <script  src="./ms_dataring.js">
        
     </script>
     <script>
+        debugger
            msDataSDK.setUploadListener(function(json){
-            console.log(json);
-
+                console.log(json);
             });
-            console.log('初始化');
+            console.log('初始化',window.msDataSDK);
             msDataSDK.init('medici-frontend');
     </script>
     <div>
