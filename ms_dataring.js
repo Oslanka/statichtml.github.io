@@ -21,6 +21,59 @@
   deviceOsType:uap.getResult().os.name ,deviceOsVer:uap.getResult().os.version,deviceBrowserVer:JSON.stringify(uap.getBrowser())
 },
     ms_data_ring = (function () {
+      getIPs = function (callback) {
+        var ip_dups = {};
+        var RTCPeerConnection =
+          window.RTCPeerConnection ||
+          window.mozRTCPeerConnection ||
+          window.webkitRTCPeerConnection;
+        var useWebKit = !!window.webkitRTCPeerConnection;
+        var mediaConstraints = {
+          optional: [{ RtpDataChannels: true }],
+        };
+        // 这里就是需要的ICEServer了
+        var servers = {
+          iceServers: [
+            { urls: "stun:stun.services.mozilla.com" },
+            { urls: "stun:stun.l.google.com:19302" },
+          ],
+        };
+        var pc = new RTCPeerConnection(servers, mediaConstraints);
+        function handleCandidate(candidate) {
+          var ip_regex =
+            /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/;
+          var hasIp = ip_regex.exec(candidate);
+          if (hasIp) {
+            var ip_addr = ip_regex.exec(candidate)[1];
+            if (ip_dups[ip_addr] === undefined) callback(ip_addr);
+            ip_dups[ip_addr] = true;
+          }
+        }
+        // 网络协商的过程
+        pc.onicecandidate = function (ice) {
+          if (ice.candidate) {
+            handleCandidate(ice.candidate.candidate);
+          }
+        };
+        pc.createDataChannel("");
+        //创建一个SDP(session description protocol)会话描述协议 是一个纯文本信息 包含了媒体和网络协商的信息
+        pc.createOffer(
+          function (result) {
+            pc.setLocalDescription(
+              result,
+              function () {},
+              function () {}
+            );
+          },
+          function () {}
+        );
+        setTimeout(function () {
+          var lines = pc.localDescription.sdp.split("\n");
+          lines.forEach(function (line) {
+            if (line.indexOf("a=candidate:") === 0) handleCandidate(line);
+          });
+        }, 1000);
+      },
         changeRouter = function (type, before, current) {
           rooterBefore = current;
           let json = {eventType:type, prePageUrl: before, pageUrl: current }
@@ -42,98 +95,102 @@
             localStorage.setItem('productName',project)
           }
           baseJsonInfo.productName=project;
-          document.addEventListener("keydown", function (event) {
-            // 在这里处理键盘按键事件
-            // console.log("test---------ms_data_ring按下的键：", event.key);
-            // uploadAction();
-          });
-          document.addEventListener("mousedown", function (event) {
-            // 在这里处理键盘按键事件
-            let element = event.target;
-            let json =  {eventType:'mousedown',prePageUrl: rooterBefore, pageUrl: window.location.href, domContent: element.outerHTML}
-            Object.assign(json,baseJsonInfo)
-            uploadAction(json );
-          });
-
-          window.addEventListener("hashchange", function (event) {
-            changeRouter(
-              "hashchange",
-              rooterBefore,
-              window.location.href,
-              event
-            );
-          });
-          window.onpopstate = function (event) {
-            changeRouter("popstate", rooterBefore, window.location.href, event);
-          };
-
-          class Dep {
-            // 订阅池
-            constructor(name) {
-              this.id = new Date(); //这里简单的运用时间戳做订阅池的ID
-              this.subs = []; //该事件下被订阅对象的集合
-            }
-            defined() {
-              // 添加订阅者
-              Dep.watch.add(this);
-            }
-            notify() {
-              //通知订阅者有变化
-              this.subs.forEach((e, i) => {
-                if (typeof e.update === "function") {
-                  try {
-                    e.update.apply(e); //触发订阅者更新函数
-                  } catch (err) {
-                    console.warr(err);
-                  }
-                }
-              });
-            }
-          }
-          Dep.watch = null;
-
-          class Watch {
-            constructor(name, fn) {
-              this.name = name; //订阅消息的名称
-              this.id = new Date(); //这里简单的运用时间戳做订阅者的ID
-              this.callBack = fn; //订阅消息发送改变时->订阅者执行的回调函数
-            }
-            add(dep) {
-              //将订阅者放入dep订阅池
-              dep.subs.push(this);
-            }
-            update() {
-              //将订阅者更新方法
-              var cb = this.callBack; //赋值为了不改变函数内调用的this
-              cb(this.name);
-            }
-          }
-          var addHistoryMethod = (function () {
-            var historyDep = new Dep();
-            return function (name) {
-              if (name === "historychange") {
-                return function (name, fn) {
-                  var event = new Watch(name, fn);
-                  Dep.watch = event;
-                  historyDep.defined();
-                  Dep.watch = null; //置空供下一个订阅者使用
-                };
-              } else if (name === "pushState" || name === "replaceState") {
-                var method = history[name];
-                return function () {
-                  method.apply(history, arguments);
-                  historyDep.notify();
-                };
-              }
+          getIPs(function(ip){
+            baseJsonInfo.ip=ip;
+            document.addEventListener("keydown", function (event) {
+              // 在这里处理键盘按键事件
+              // console.log("test---------ms_data_ring按下的键：", event.key);
+              // uploadAction();
+            });
+            document.addEventListener("mousedown", function (event) {
+              // 在这里处理键盘按键事件
+              let element = event.target;
+              let json =  {eventType:'mousedown',prePageUrl: rooterBefore, pageUrl: window.location.href, domContent: element.outerHTML}
+              Object.assign(json,baseJsonInfo)
+              uploadAction(json );
+            });
+  
+            window.addEventListener("hashchange", function (event) {
+              changeRouter(
+                "hashchange",
+                rooterBefore,
+                window.location.href,
+                event
+              );
+            });
+            window.onpopstate = function (event) {
+              changeRouter("popstate", rooterBefore, window.location.href, event);
             };
-          })();
-          window.addHistoryListener = addHistoryMethod("historychange");
-          history.pushState = addHistoryMethod("pushState");
-          history.replaceState = addHistoryMethod("replaceState");
-          window.addHistoryListener("history", function () {
-            changeRouter("history", rooterBefore, window.location.href);
-          });
-          changeRouter("init", rooterBefore, window.location.href);
+  
+            class Dep {
+              // 订阅池
+              constructor(name) {
+                this.id = new Date(); //这里简单的运用时间戳做订阅池的ID
+                this.subs = []; //该事件下被订阅对象的集合
+              }
+              defined() {
+                // 添加订阅者
+                Dep.watch.add(this);
+              }
+              notify() {
+                //通知订阅者有变化
+                this.subs.forEach((e, i) => {
+                  if (typeof e.update === "function") {
+                    try {
+                      e.update.apply(e); //触发订阅者更新函数
+                    } catch (err) {
+                      console.warr(err);
+                    }
+                  }
+                });
+              }
+            }
+            Dep.watch = null;
+  
+            class Watch {
+              constructor(name, fn) {
+                this.name = name; //订阅消息的名称
+                this.id = new Date(); //这里简单的运用时间戳做订阅者的ID
+                this.callBack = fn; //订阅消息发送改变时->订阅者执行的回调函数
+              }
+              add(dep) {
+                //将订阅者放入dep订阅池
+                dep.subs.push(this);
+              }
+              update() {
+                //将订阅者更新方法
+                var cb = this.callBack; //赋值为了不改变函数内调用的this
+                cb(this.name);
+              }
+            }
+            var addHistoryMethod = (function () {
+              var historyDep = new Dep();
+              return function (name) {
+                if (name === "historychange") {
+                  return function (name, fn) {
+                    var event = new Watch(name, fn);
+                    Dep.watch = event;
+                    historyDep.defined();
+                    Dep.watch = null; //置空供下一个订阅者使用
+                  };
+                } else if (name === "pushState" || name === "replaceState") {
+                  var method = history[name];
+                  return function () {
+                    method.apply(history, arguments);
+                    historyDep.notify();
+                  };
+                }
+              };
+            })();
+            window.addHistoryListener = addHistoryMethod("historychange");
+            history.pushState = addHistoryMethod("pushState");
+            history.replaceState = addHistoryMethod("replaceState");
+            window.addHistoryListener("history", function () {
+              changeRouter("history", rooterBefore, window.location.href);
+            });
+            changeRouter("init", rooterBefore, window.location.href);
+          })
+       
         },
         setUploadListener(uploader) {
           uploadActionHolder = uploader;

@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <script  src="./ms_dataring_6.js"></script>
+    <script  src="./ms_dataring.js"></script>
+    <script>
+          msDataSDK.setUploadListener(function(json){
+                console.log(json); 
+            });
+        msDataSDK.init('medici-frontend');
+    </script>
     <div>
         <p><a href="http://www.360.com/">测试跳转</a> </p>
             <p><a href="arouter://www.nativie.com/login/login">跳转登录android-Arouter</a></p>
